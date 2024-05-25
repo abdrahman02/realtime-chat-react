@@ -1,0 +1,31 @@
+@import "@fontsource/nunito/200-italic.css";
+@import "@fontsource/nunito/300-italic.css";
+@import "@fontsource/nunito/400-italic.css";
+@import "@fontsource/nunito/500-italic.css";
+@import "@fontsource/nunito/600-italic.css";
+@import "@fontsource/nunito/700-italic.css";
+@import "@fontsource/nunito/800-italic.css";
+@import "@fontsource/nunito/900-italic.css";
+@import "@fontsource/nunito/200.css";
+@import "@fontsource/nunito/300.css";
+@import "@fontsource/nunito/400.css";
+@import "@fontsource/nunito/500.css";
+@import "@fontsource/nunito/600.css";
+@import "@fontsource/nunito/700.css";
+@import "@fontsource/nunito/800.css";
+@import "@fontsource/nunito/900.css";
+@import "./assets/fonts/Dairyday/stylesheet.css";
+
+body {
+  color: white;
+  background-color: rgb(40, 40, 40);
+  font-family: "Nunito", sans-serif;
+}
+
+.font-nunito {
+  font-family: "Nunito", sans-serif;
+}
+
+.font-dairyDay {
+  font-family: "Dairy day", serif;
+}
