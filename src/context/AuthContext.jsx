@@ -19,6 +19,12 @@ export const AuthContextProvider = ({ children }) => {
     email: "",
     password: "",
   });
+  const [loginError, setLoginError] = useState(null);
+  const [isLoginLoading, setIsLoginLoading] = useState(false);
+  const [loginInfo, setLoginInfo] = useState({
+    email: "",
+    password: "",
+  });
 
   useEffect(() => {
     const user = localStorage.getItem("User");
@@ -26,6 +32,7 @@ export const AuthContextProvider = ({ children }) => {
     setUser(JSON.parse(user));
   }, []);
 
+  // REGISTER
   const registerUser = useCallback(
     async (e) => {
       e.preventDefault();
@@ -47,7 +54,6 @@ export const AuthContextProvider = ({ children }) => {
     },
     [registerInfo]
   );
-
   const updateRegisterInfo = useCallback(
     (info) => {
       setRegisterInfo({ ...registerInfo, ...info });
@@ -55,6 +61,36 @@ export const AuthContextProvider = ({ children }) => {
     [registerInfo]
   );
 
+  // LOGIN
+  const loginUser = useCallback(
+    async (e) => {
+      e.preventDefault();
+      setIsLoginLoading(true);
+      setLoginError(null);
+
+      const response = await postRequest(
+        `${baseUrl}/users/login`,
+        JSON.stringify(loginInfo)
+      );
+
+      setIsLoginLoading(false);
+
+      if (response.success === false) return setLoginError(response.msg);
+
+      localStorage.setItem("User", JSON.stringify(response));
+
+      setUser(response);
+    },
+    [loginInfo]
+  );
+  const updateLoginInfo = useCallback(
+    (info) => {
+      setLoginInfo({ ...loginInfo, ...info });
+    },
+    [loginInfo]
+  );
+
+  // LOGOUT
   const logoutUser = useCallback(() => {
     localStorage.removeItem("User");
     setUser(null);
@@ -70,6 +106,11 @@ export const AuthContextProvider = ({ children }) => {
           registerUser,
           registerError,
           isRegisterLoading,
+          loginInfo,
+          updateLoginInfo,
+          loginUser,
+          loginError,
+          isLoginLoading,
           logoutUser,
         }),
         [
@@ -79,6 +120,11 @@ export const AuthContextProvider = ({ children }) => {
           registerUser,
           registerError,
           isRegisterLoading,
+          loginInfo,
+          updateLoginInfo,
+          loginUser,
+          loginError,
+          isLoginLoading,
           logoutUser,
         ]
       )}
