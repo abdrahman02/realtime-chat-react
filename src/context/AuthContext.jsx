@@ -27,9 +27,11 @@ export const AuthContextProvider = ({ children }) => {
   });
 
   useEffect(() => {
-    const user = localStorage.getItem("User");
-
-    setUser(JSON.parse(user));
+    let user = localStorage.getItem("User");
+    if (user) {
+      user = JSON.parse(user);
+      setUser(user.data);
+    }
   }, []);
 
   // REGISTER
@@ -50,7 +52,7 @@ export const AuthContextProvider = ({ children }) => {
 
       localStorage.setItem("User", JSON.stringify(response));
 
-      setUser(response);
+      setUser(response.data);
     },
     [registerInfo]
   );
@@ -79,7 +81,7 @@ export const AuthContextProvider = ({ children }) => {
 
       localStorage.setItem("User", JSON.stringify(response));
 
-      setUser(response);
+      setUser(response.data);
     },
     [loginInfo]
   );

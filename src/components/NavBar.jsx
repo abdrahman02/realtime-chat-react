@@ -15,7 +15,7 @@ const NavBar = () => {
           </Link>
         </h2>
         {user && (
-          <span className="text-warning">Logged in as {user?.data.name}</span>
+          <span className="text-warning">Logged in as {user?.name}</span>
         )}
         <Nav>
           <Stack direction="horizontal" gap={3}>
