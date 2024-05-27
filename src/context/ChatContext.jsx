@@ -7,6 +7,7 @@ import {
 } from "react";
 import PropTypes from "prop-types";
 import { baseUrl, postRequest, getRequest } from "../utils/services";
+import { io } from "socket.io-client";
 
 export const ChatContext = createContext();
 
@@ -21,6 +22,8 @@ export const ChatContextProvider = ({ children, user }) => {
   const [isMessagesError, setIsMessagesError] = useState(null);
   const [isSendMessagesError, setIsSendMessagesError] = useState(null);
   const [newMessage, setNewMessage] = useState(null);
+  const [socket, setSocket] = useState(null);
+  const [onlineUsers, setOnlineUsers] = useState([]);
 
   useEffect(() => {
     const getUsers = async () => {
@@ -125,6 +128,47 @@ export const ChatContextProvider = ({ children, user }) => {
     []
   );
 
+  // Connecting to socket
+  useEffect(() => {
+    const newSocket = io("http://localhost:3000");
+    setSocket(newSocket);
+    return () => newSocket.disconnect();
+  }, [user]);
+
+  // Add new online users
+  useEffect(() => {
+    if (socket == null) return;
+    socket.emit("addNewUser", user?._id);
+    socket.on("getOnlineUser", (res) => {
+      setOnlineUsers(res);
+    });
+
+    return () => socket.off("getOnlineUser");
+  }, [socket]);
+
+  // Send message
+  useEffect(() => {
+    if (socket === null) return;
+
+    const recipientId = currentChat?.members.find((id) => id !== user?._id);
+
+    socket.emit("sendMessage", { ...newMessage, recipientId });
+  }, [newMessage]);
+
+  // Receive message
+  useEffect(() => {
+    if (socket === null) return;
+
+    socket.on("getMessage", (res) => {
+      if (currentChat?._id !== res.chatId) return;
+      setMessages((prev) => [...prev, res]);
+    });
+
+    return () => {
+      socket.off("getMessage");
+    };
+  }, [socket, currentChat]);
+
   return (
     <ChatContext.Provider
       value={useMemo(
@@ -140,6 +184,7 @@ export const ChatContextProvider = ({ children, user }) => {
           isMessagesLoading,
           isMessagesError,
           sendTextMessage,
+          onlineUsers,
         }),
         [
           userChats,
@@ -153,6 +198,7 @@ export const ChatContextProvider = ({ children, user }) => {
           isMessagesLoading,
           isMessagesError,
           sendTextMessage,
+          onlineUsers,
         ]
       )}
     >
