@@ -1,8 +1,8 @@
 import {
   createContext,
   useCallback,
+  useContext,
   useEffect,
-  useMemo,
   useState,
 } from "react";
 import PropTypes from "prop-types";
@@ -92,50 +92,33 @@ export const AuthContextProvider = ({ children }) => {
     [loginInfo]
   );
 
-  // LOGOUT
-  const logoutUser = useCallback(() => {
-    localStorage.removeItem("User");
-    setUser(null);
-  }, []);
+  const value = {
+    user,
+    setUser,
+    registerInfo,
+    updateRegisterInfo,
+    registerUser,
+    registerError,
+    isRegisterLoading,
+    loginInfo,
+    updateLoginInfo,
+    loginUser,
+    loginError,
+    isLoginLoading,
+  };
 
-  return (
-    <AuthContext.Provider
-      value={useMemo(
-        () => ({
-          user,
-          registerInfo,
-          updateRegisterInfo,
-          registerUser,
-          registerError,
-          isRegisterLoading,
-          loginInfo,
-          updateLoginInfo,
-          loginUser,
-          loginError,
-          isLoginLoading,
-          logoutUser,
-        }),
-        [
-          user,
-          registerInfo,
-          updateRegisterInfo,
-          registerUser,
-          registerError,
-          isRegisterLoading,
-          loginInfo,
-          updateLoginInfo,
-          loginUser,
-          loginError,
-          isLoginLoading,
-          logoutUser,
-        ]
-      )}
-    >
-      {children}
-    </AuthContext.Provider>
-  );
+  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 };
 
 AuthContextProvider.propTypes = {
   children: PropTypes.node.isRequired,
+};
+
+export const useAuth = () => {
+  const context = useContext(AuthContext);
+
+  if (context === undefined)
+    throw new Error("useAuth must be used within a AuthContextProvider");
+
+  return context;
 };
