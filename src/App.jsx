@@ -5,42 +5,36 @@ import { useAuth } from "./context/AuthContext";
 import Chat from "./pages/Chat";
 import Auth from "./pages/Auth";
 import ProtectedRoute from "./ProtectedRoute";
-import Modal from "./components/Modal";
-import { useModal } from "./context/ModalContext";
+import PublicRoute from "./PublicRoute";
 
 function App() {
   const { user } = useAuth();
-  const { modalInfo, closeModal } = useModal();
-  const { open, status, messages } = modalInfo;
-  console.log({ modalInfo });
 
   return (
     <ChatContextProvider user={user}>
       <NavBar />
       <Routes>
-        <Route path="/" element={<ProtectedRoute pages={<Chat />} />} />
-        <Route path="/tes" element={<Modal />} />
+        <Route path="/" element={<ProtectedRoute element={<Chat />} />} />
         <Route
           path="/signin"
-          element={<ProtectedRoute pages={<Auth formType="signin" />} />}
+          element={
+            <PublicRoute
+              restricted={true}
+              element={<Auth formType="signin" />}
+            />
+          }
         />
         <Route
           path="/signup"
           element={
-            <ProtectedRoute
-              pages={<Auth formType="signup" />}
-              navigateTo="/signup"
+            <PublicRoute
+              restricted={true}
+              element={<Auth formType="signup" />}
             />
           }
         />
         <Route path="*" element={<Navigate to="/" />} />
       </Routes>
-      <Modal
-        open={open}
-        onClose={closeModal}
-        status={status}
-        messages={messages}
-      />
     </ChatContextProvider>
   );
 }

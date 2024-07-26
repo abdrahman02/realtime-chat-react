@@ -9,20 +9,20 @@ import { Label } from "../ui/label";
 import { Input } from "../ui/input";
 import { Link, useNavigate } from "react-router-dom";
 import { Button } from "../ui/button";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { baseUrl, postRequest } from "@/utils/services";
 import { useAuth } from "@/context/AuthContext";
 import { useModal } from "@/context/ModalContext";
 import { Loader2, LogIn, UserRoundPlus } from "lucide-react";
 
 const AuthLayout = ({ formType }) => {
-  const initStateFormSignIn = { email: "", password: "" };
-  const initStateFormSignUp = {
+  const initStateFormSignIn = useMemo(() => ({ email: "", password: "" }), []);
+  const initStateFormSignUp = useMemo(() => ({
     name: "",
     email: "",
     password: "",
     confPassword: "",
-  };
+  }), []);
 
   const { setUser } = useAuth();
   const { showModal } = useModal();

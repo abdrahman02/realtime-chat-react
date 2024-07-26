@@ -2,13 +2,14 @@ import { Navigate } from "react-router-dom";
 import { useAuth } from "./context/AuthContext";
 import PropTypes from "prop-types";
 
-const ProtectedRoute = ({ element }) => {
+const PublicRoute = ({ element, restricted }) => {
   const { user } = useAuth();
 
-  return user ? element : <Navigate to="/signin" />;
+  return user && restricted ? <Navigate to="/" /> : element;
 };
-ProtectedRoute.propTypes = {
+PublicRoute.propTypes = {
   element: PropTypes.node.isRequired,
+  restricted: PropTypes.bool.isRequired,
 };
 
-export default ProtectedRoute;
+export default PublicRoute;
