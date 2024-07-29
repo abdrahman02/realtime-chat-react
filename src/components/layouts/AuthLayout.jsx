@@ -33,12 +33,14 @@ const AuthLayout = ({ formType }) => {
   const [formSignUp, setFormSignUp] = useState(initStateFormSignUp);
   const [authLoading, setAuthLoading] = useState(false);
   const [validationError, setValidationError] = useState([]);
+  const [successAlert, setSuccessAlert] = useState(null);
 
   const handleSubmit = useCallback(
     async (e) => {
       e.preventDefault();
       setAuthLoading(true);
       setValidationError([]);
+      setSuccessAlert(null);
       try {
         if (formType === "signin") {
           const response = await postRequest(
@@ -46,22 +48,23 @@ const AuthLayout = ({ formType }) => {
             JSON.stringify(formSignIn)
           );
           if (response.success === false)
-            return setValidationError((prev) => [prev, response.msg]);
-          console.log({ response });
+            return setValidationError([response.msg]);
           localStorage.setItem("User", JSON.stringify(response.data));
           setFormSignIn(initStateFormSignIn);
+          setSuccessAlert(response.msg);
           return setUser(response.data);
         } else {
           const response = await postRequest(
             `${baseUrl}/users/register`,
             JSON.stringify(formSignUp)
           );
+          if (response.success === false && response.errors)
+            return setValidationError(response.errors);
           setFormSignUp(initStateFormSignUp);
-          console.log({ response });
-          navigate("/signin");
+          setSuccessAlert(response.msg);
+          return navigate("/signin");
         }
       } catch (error) {
-        console.log({ error });
         return null;
       } finally {
         setAuthLoading(false);
@@ -70,16 +73,35 @@ const AuthLayout = ({ formType }) => {
     [formSignIn, formSignUp]
   );
 
+
   return (
     <div className="w-full h-full flex flex-col items-center">
       <CardHeader className="flex flex-col justify-center items-center">
         <CardTitle>{formType === "signin" ? "SIGN IN" : "SIGN UP"}</CardTitle>
         {formType === "signin" && validationError.length > 0 && (
-          <p className="text-sm text-rose-700 capitalize">{validationError}</p>
+          <p className="text-sm bg-rose-100 border border-rose-400 text-rose-700 p-2 rounded-sm capitalize">
+            {validationError}
+          </p>
+        )}
+        {successAlert && (
+          <p className="text-sm text-emerald-700 capitalize p-2 rounded-sm border border-emerald-400 bg-emerald-100">
+            {successAlert}
+          </p>
         )}
       </CardHeader>
       <form onSubmit={handleSubmit} className="w-full h-full">
         <CardContent className="flex flex-col gap-y-5">
+          {formType === "signup" && validationError.length > 0 && (
+            <div className="bg-rose-100 border border-rose-400 text-rose-700 px-4 py-3 rounded">
+              <ul className="list-disc list-inside">
+                {validationError.map((error, index) => (
+                  <li key={index} className="text-sm capitalize">
+                    {error}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
           {formType === "signup" && (
             <div className="grid w-full items-center gap-1.5">
               <Label htmlFor="name">Name</Label>
