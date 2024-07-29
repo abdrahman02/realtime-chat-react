@@ -14,7 +14,7 @@ export const postRequest = async (url, body) => {
 
     return data;
   } catch (error) {
-    console.log(`Error: ${error.message}`);
+    console.log({ error });
     return { success: false, msg: error.message };
   }
 };
@@ -24,10 +24,10 @@ export const getRequest = async (url) => {
     const response = await fetch(url);
 
     const data = await response.json();
-    
+
     return data;
   } catch (error) {
-    console.log(`Error: ${error.message}`);
+    console.log({ error });
     return { success: false, msg: error.message };
   }
 };

@@ -9,66 +9,74 @@ import { Label } from "../ui/label";
 import { Input } from "../ui/input";
 import { Link, useNavigate } from "react-router-dom";
 import { Button } from "../ui/button";
-import { useMemo, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 import { baseUrl, postRequest } from "@/utils/services";
 import { useAuth } from "@/context/AuthContext";
-import { useModal } from "@/context/ModalContext";
 import { Loader2, LogIn, UserRoundPlus } from "lucide-react";
 
 const AuthLayout = ({ formType }) => {
   const initStateFormSignIn = useMemo(() => ({ email: "", password: "" }), []);
-  const initStateFormSignUp = useMemo(() => ({
-    name: "",
-    email: "",
-    password: "",
-    confPassword: "",
-  }), []);
+  const initStateFormSignUp = useMemo(
+    () => ({
+      name: "",
+      email: "",
+      password: "",
+      confPassword: "",
+    }),
+    []
+  );
 
   const { setUser } = useAuth();
-  const { showModal } = useModal();
   const navigate = useNavigate();
 
   const [formSignIn, setFormSignIn] = useState(initStateFormSignIn);
   const [formSignUp, setFormSignUp] = useState(initStateFormSignUp);
   const [authLoading, setAuthLoading] = useState(false);
+  const [validationError, setValidationError] = useState([]);
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    setAuthLoading(true);
-    try {
-      if (formType === "signin") {
-        const response = await postRequest(
-          `${baseUrl}/users/login`,
-          JSON.stringify(formSignIn)
-        );
-        setFormSignIn(initStateFormSignIn);
-        if (response.success === false)
-          return showModal("error", [response.msg]);
-        localStorage.setItem("User", JSON.stringify(response));
-        return setUser(response.data);
-      } else {
-        const response = await postRequest(
-          `${baseUrl}/users/register`,
-          JSON.stringify(formSignUp)
-        );
-        setFormSignUp(initStateFormSignUp);
-        if (response.success === false)
-          return showModal("error", [response.msg]);
-        showModal("success", response.msg);
-        navigate("/signin");
+  const handleSubmit = useCallback(
+    async (e) => {
+      e.preventDefault();
+      setAuthLoading(true);
+      setValidationError([]);
+      try {
+        if (formType === "signin") {
+          const response = await postRequest(
+            `${baseUrl}/users/login`,
+            JSON.stringify(formSignIn)
+          );
+          if (response.success === false)
+            return setValidationError((prev) => [prev, response.msg]);
+          console.log({ response });
+          localStorage.setItem("User", JSON.stringify(response.data));
+          setFormSignIn(initStateFormSignIn);
+          return setUser(response.data);
+        } else {
+          const response = await postRequest(
+            `${baseUrl}/users/register`,
+            JSON.stringify(formSignUp)
+          );
+          setFormSignUp(initStateFormSignUp);
+          console.log({ response });
+          navigate("/signin");
+        }
+      } catch (error) {
+        console.log({ error });
+        return null;
+      } finally {
+        setAuthLoading(false);
       }
-    } catch (error) {
-      console.error("An error occurred:", error);
-      return null;
-    } finally {
-      setAuthLoading(false);
-    }
-  };
+    },
+    [formSignIn, formSignUp]
+  );
 
   return (
     <div className="w-full h-full flex flex-col items-center">
-      <CardHeader>
+      <CardHeader className="flex flex-col justify-center items-center">
         <CardTitle>{formType === "signin" ? "SIGN IN" : "SIGN UP"}</CardTitle>
+        {formType === "signin" && validationError.length > 0 && (
+          <p className="text-sm text-rose-700 capitalize">{validationError}</p>
+        )}
       </CardHeader>
       <form onSubmit={handleSubmit} className="w-full h-full">
         <CardContent className="flex flex-col gap-y-5">
