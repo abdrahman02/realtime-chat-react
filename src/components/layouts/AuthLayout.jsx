@@ -49,7 +49,9 @@ const AuthLayout = ({ formType }) => {
           );
           if (response.success === false)
             return setValidationError([response.msg]);
+          console.log({ response });
           localStorage.setItem("User", JSON.stringify(response.data));
+          localStorage.setItem("Token", JSON.stringify(response.token));
           setFormSignIn(initStateFormSignIn);
           setSuccessAlert(response.msg);
           return setUser(response.data);
@@ -72,7 +74,6 @@ const AuthLayout = ({ formType }) => {
     },
     [formSignIn, formSignUp]
   );
-
 
   return (
     <div className="w-full h-full flex flex-col items-center">

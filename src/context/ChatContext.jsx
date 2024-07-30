@@ -1,6 +1,7 @@
 import {
   createContext,
   useCallback,
+  useContext,
   useEffect,
   useMemo,
   useState,
@@ -286,4 +287,13 @@ export const ChatContextProvider = ({ children, user }) => {
 ChatContextProvider.propTypes = {
   children: PropTypes.node.isRequired,
   user: PropTypes.object,
+};
+
+export const useChat = () => {
+  const context = useContext(ChatContext);
+
+  if (context === undefined)
+    throw new Error("useTheme must be used within a ThemeProvider");
+
+  return context;
 };

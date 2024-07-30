@@ -12,18 +12,20 @@ import { useState } from "react";
 // import Notification from "./chat/Notification";
 
 const NavBar = () => {
-  const { user, setUser } = useAuth();
+  const { user, setUser, setToken } = useAuth();
   const [authLoading, setAuthLoading] = useState(false);
 
   const signOut = () => {
     setAuthLoading(true);
     localStorage.removeItem("User");
+    localStorage.removeItem("Token");
     setUser(null);
+    setToken(null);
     setAuthLoading(false);
   };
 
   return (
-    <header className="w-full h-14 md:h-16 mb-2 flex flex-col justify-center items-center bg-primary text-primary-foreground">
+    <header className="w-full h-14 md:h-16 flex flex-col justify-center items-center bg-primary text-primary-foreground">
       <div className="w-full h-full px-10 py-1 md:py-0 flex flex-row justify-between items-center">
         <span className="text-2xl font-geist-sans font-bold">
           <Link
